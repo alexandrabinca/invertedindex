@@ -101,10 +101,7 @@ public class InvertedIndex {
 
         System.out.println("compute intersection");
         for (int i = 1; i < allDocuments.size(); ++i) {
-            System.out.println(intersection);
-            System.out.println(allDocuments.get(i));
             intersection = CollectionUtils.intersection(intersection, allDocuments.get(i));
-            System.out.println(intersection);
         }
 
         if (intersection.isEmpty()) {
