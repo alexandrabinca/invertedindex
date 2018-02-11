@@ -1,45 +1,41 @@
-import processor.TxtFileProcessor;
+import index.InvertedIndex;
+import processor.TextProcessor;
+import processor.WordProcessor;
+import utils.EnStemmer;
+import utils.EnStopWordsFilter;
+import utils.RoStemmer;
+import utils.RoStopWordsFilter;
 
 import java.io.File;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class Main {
-    public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter file path where documents are located:");
 
-        String path = scanner.nextLine();
-        File file = new File(path);
+        //TODO Uncomment for production String path = scanner.nextLine();
+        String path = "/home/oem/IntelliJIDEAProjects/invertedindex/src/main/resources/input";
         System.out.println("> Indexing process started...");
 
-        processFile(file);
+        InvertedIndex.getInstance().addFilesToIndex(path);
 
         System.out.println("Enter search words:");
         String searchWords;
-        while (!(searchWords = scanner.nextLine()).equals("exit")) {
-
-        }
-        executorService.shutdown();
-    }
-
-    private static void processFile(File file) throws ExecutionException, InterruptedException {
-        if (!file.exists()) {
-            System.exit(-1);
-        }
-        if (file.isDirectory()) {
-            for (File f :  file.listFiles()) {
-                processFile(f);
+        while (!(searchWords = "oameni"//TODO Uncomment for production scanner.nextLine()
+                 ).equals("exit")) {
+            String result;
+            List<String> words = new TextProcessor(searchWords, new WordProcessor(EnStopWordsFilter.getInstance(), EnStemmer.getInstance())).getAllWords();
+            result = InvertedIndex.getInstance().searchWordsInIndex(words);
+            if (result.equals(InvertedIndex.NO_RESULT)) {
+                words = new TextProcessor(searchWords, new WordProcessor(RoStopWordsFilter.getInstance(), RoStemmer.getInstance())).getAllWords();
+                result = InvertedIndex.getInstance().searchWordsInIndex(words);
             }
-        } else {
-            Future<Map<String, Integer>> documentWordCount = executorService.submit(new TxtFileProcessor(file));
-            System.out.println(documentWordCount.get());
+            System.out.println(result);
+            //TODO DELETE THIS LINE for production
+            System.exit(0);
         }
     }
 }
