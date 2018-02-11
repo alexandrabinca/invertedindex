@@ -1,6 +1,6 @@
 package index;
 
-import utils.Normalizer;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.File;
 import java.util.*;
@@ -97,16 +97,20 @@ public class InvertedIndex {
         if (allDocuments.size() == 1) {
             return getDocumentsInRankOrder(allDocuments.get(0));
         }
-        SortedSet<DocToOccurrences> intersection = Collections.synchronizedSortedSet(new TreeSet<>(allDocuments.get(0)));
+        Collection<DocToOccurrences> intersection = allDocuments.get(0);
 
+        System.out.println("compute intersection");
         for (int i = 1; i < allDocuments.size(); ++i) {
-            intersection.retainAll(allDocuments.get(i));
+            System.out.println(intersection);
+            System.out.println(allDocuments.get(i));
+            intersection = CollectionUtils.intersection(intersection, allDocuments.get(i));
+            System.out.println(intersection);
         }
 
         if (intersection.isEmpty()) {
             return  Collections.EMPTY_LIST;
         }
-        return getDocumentsInRankOrder(intersection);
+        return getDocumentsInRankOrder(Collections.synchronizedSortedSet(new TreeSet<>(intersection)));
     }
 
     private List<String> getDocumentsInRankOrder(SortedSet<DocToOccurrences> documents) {
