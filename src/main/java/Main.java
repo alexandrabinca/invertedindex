@@ -1,13 +1,5 @@
-import filter.EnStopWordsFilter;
-import filter.RoStopWordsFilter;
 import index.InvertedIndex;
 import org.apache.log4j.Logger;
-import processor.TextProcessor;
-import processor.WordProcessor;
-import stemmer.EnStemmer;
-import stemmer.RoStemmer;
-import utils.Language;
-import utils.LanguageDetector;
 
 import java.util.List;
 import java.util.Scanner;
@@ -19,8 +11,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter file path where documents are located:");
 
-        //TODO Uncomment for prouction String path = scanner.nextLine();
-        String path = "/home/oem/IntelliJIDEAProjects/invertedindex/src/main/resources/input";
+        String path = scanner.nextLine();
         logger.info("Indexing process started...");
 
         InvertedIndex.getInstance().addFilesToIndex(path);
@@ -28,7 +19,7 @@ public class Main {
         System.out.println("Enter search words:");
         String searchWords;
         while (!(searchWords = scanner.nextLine()).equals("exit")) {
-            List<String> result = getSearchResult(searchWords);
+            List<String> result = InvertedIndex.getInstance().getSearchResult(searchWords);
             if (result.isEmpty()) {
                 System.out.println("> Your query doesn't match any document.");
             } else {
@@ -40,19 +31,4 @@ public class Main {
         }
     }
 
-    private static List<String> getSearchResult(String searchWords) {
-        List<String> result;
-        if (Language.RO ==  LanguageDetector.detectLanguage(searchWords)) {
-            List<String> words = new TextProcessor(searchWords, new WordProcessor(RoStopWordsFilter.getInstance(), RoStemmer.getInstance())).getAllWords();
-            result = InvertedIndex.getInstance().searchWordsInIndex(words);
-        } else {
-            List<String> words = new TextProcessor(searchWords, new WordProcessor(EnStopWordsFilter.getInstance(), EnStemmer.getInstance())).getAllWords();
-            result = InvertedIndex.getInstance().searchWordsInIndex(words);
-            if (result.isEmpty()) { // difficult to detect ro from few words
-                words = new TextProcessor(searchWords, new WordProcessor(RoStopWordsFilter.getInstance(), RoStemmer.getInstance())).getAllWords();
-                result = InvertedIndex.getInstance().searchWordsInIndex(words);
-            }
-        }
-        return result;
-    }
 }

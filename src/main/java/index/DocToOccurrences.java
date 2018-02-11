@@ -2,6 +2,12 @@ package index;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * This object keeps the information about the document and how many occurrences were in that document for a specific word.
+ *
+ * It implements comparable based on wordOccurrences to be able to rank the documents.
+ * The equals and hashCode methods use the documentId.
+ */
 class DocToOccurrences implements Comparable<DocToOccurrences>{
     private long documentId;
     private AtomicLong wordOccurrences;

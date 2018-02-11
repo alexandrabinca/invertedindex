@@ -1,5 +1,6 @@
 package reader;
 
+import org.apache.log4j.Logger;
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
@@ -7,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class DocumentReader {
+    private Logger logger = Logger.getLogger(DocumentReader.class);
+
     private AbstractReader reader;
 
     public DocumentReader(File file) {
@@ -24,7 +27,7 @@ public class DocumentReader {
                 reader = new TXTReader(filePath);
                 break;
             default:
-                throw new RuntimeException("invalid extension");
+                logger.info("The file " + filePath + " has an unsupported format. It was not processed." );
         }
     }
 

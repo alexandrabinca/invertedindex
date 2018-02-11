@@ -1,17 +1,33 @@
 package index;
 
+import filter.EnStopWordsFilter;
+import filter.RoStopWordsFilter;
 import index.task.FileProcessingTask;
 import index.task.IndexingTask;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Logger;
+import processor.TextProcessor;
+import processor.WordProcessor;
+import stemmer.EnStemmer;
+import stemmer.RoStemmer;
+import utils.Language;
+import utils.LanguageDetector;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * InvertedIndex - singleton.
+ * Stores the inverted index as a map from Words to Ranked List of documents.
+ * The ranking is possible because of {@link index.DocToOccurrences} object that implements comparable based on word occurrences.
+ *
+ * It also keeps the mappings from documents to internal ids and vice versa.
+ */
 public class InvertedIndex {
     private Logger logger = Logger.getLogger(InvertedIndex.class);
+
     private AtomicLong crtId = new AtomicLong();
     private Map<Long, String> idToFile = new ConcurrentHashMap<>();
     private Map<String, Long> fileToId = new ConcurrentHashMap<>();
@@ -26,6 +42,16 @@ public class InvertedIndex {
         return instance;
     }
 
+    /**
+     * All the files that are found at the specified path are processed in parallel using executorService
+     * and {@link index.task.FileProcessingTask}.
+     * The {@link processor.TextProcessor} will detect the language and will create the proper
+     * {@link processor.WordProcessor} that will help with all the operations needed (Normalization,
+     * Stop words filtering, Stemming) for each token.
+     * {@link index.task.FileProcessingTask} will return a future map from each word to words occurrences
+     * that will be added to the index using {@link index.task.IndexingTask}.
+     * @param path - the path of files to be indexed
+     */
     public void addFilesToIndex(String path) {
         File file = new File(path);
         if (!file.exists()) {
@@ -57,6 +83,11 @@ public class InvertedIndex {
         }
     }
 
+    /**
+     * Add a word to occurrences map to the index
+     * @param filePath
+     * @param wordCounter
+     */
     public void addWordsToIndex(String filePath, Map<String, Integer> wordCounter) {
         if (!fileToId.containsKey(filePath)) {
             long id = crtId.incrementAndGet();
@@ -86,7 +117,29 @@ public class InvertedIndex {
         }
     }
 
-    public List<String> searchWordsInIndex(List<String> words) {
+    /**
+     * process the user input in the same way that the files are processed (Normalization,
+     * Stop words filtering, Stemming)
+     * @param searchWords - user input
+     * @return the list of files that contains user input in a ranked order
+     */
+    public List<String> getSearchResult(String searchWords) {
+        List<String> result;
+        if (Language.RO ==  LanguageDetector.detectLanguage(searchWords)) {
+            List<String> words = new TextProcessor(searchWords, new WordProcessor(RoStopWordsFilter.getInstance(), RoStemmer.getInstance())).getAllWords();
+            result = searchWordsInIndex(words);
+        } else {
+            List<String> words = new TextProcessor(searchWords, new WordProcessor(EnStopWordsFilter.getInstance(), EnStemmer.getInstance())).getAllWords();
+            result = searchWordsInIndex(words);
+            if (result.isEmpty()) { // difficult to detect ro from few words
+                words = new TextProcessor(searchWords, new WordProcessor(RoStopWordsFilter.getInstance(), RoStemmer.getInstance())).getAllWords();
+                result = searchWordsInIndex(words);
+            }
+        }
+        return result;
+    }
+
+    private List<String> searchWordsInIndex(List<String> words) {
         List<SortedSet<DocToOccurrences>> allDocuments = new ArrayList<>();
         for (String word : words) {
             if (index.containsKey(word)) {
