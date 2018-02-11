@@ -3,6 +3,7 @@ package index;
 import index.task.FileProcessingTask;
 import index.task.IndexingTask;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.*;
@@ -10,9 +11,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InvertedIndex {
-
+    private Logger logger = Logger.getLogger(InvertedIndex.class);
     private AtomicLong crtId = new AtomicLong();
-
     private Map<Long, String> idToFile = new ConcurrentHashMap<>();
     private Map<String, Long> fileToId = new ConcurrentHashMap<>();
 
@@ -45,7 +45,7 @@ public class InvertedIndex {
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         for (File f : filesInPath) {
             String absolutePath = f.getAbsolutePath();
-            System.out.println("> Indexing " + absolutePath);
+            logger.info("Indexing " + absolutePath);
             Future<Map<String, Integer>> wordCounter = executorService.submit(new FileProcessingTask(f));
             executorService.submit(new IndexingTask(absolutePath, wordCounter));
         }
@@ -53,7 +53,7 @@ public class InvertedIndex {
         try {
             executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
-            // TODO - log error
+            logger.error("Failed to stop executor service.", e);
         }
     }
 
@@ -101,7 +101,6 @@ public class InvertedIndex {
         }
         Collection<DocToOccurrences> intersection = allDocuments.get(0);
 
-        System.out.println("compute intersection");
         for (int i = 1; i < allDocuments.size(); ++i) {
             intersection = CollectionUtils.intersection(intersection, allDocuments.get(i));
         }

@@ -6,7 +6,6 @@ public class Normalizer {
 
     public static String normalize(String word) {
         if (isUrl(word) || isFilePath(word)) {
-            System.out.println(word);
             return "";
         }
         StringBuilder sb = new StringBuilder();

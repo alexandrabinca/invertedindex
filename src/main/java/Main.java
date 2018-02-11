@@ -1,23 +1,27 @@
-import index.InvertedIndex;
-import processor.TextProcessor;
-import processor.WordProcessor;
-import utils.*;
 import filter.EnStopWordsFilter;
 import filter.RoStopWordsFilter;
+import index.InvertedIndex;
+import org.apache.log4j.Logger;
+import processor.TextProcessor;
+import processor.WordProcessor;
 import stemmer.EnStemmer;
 import stemmer.RoStemmer;
+import utils.Language;
+import utils.LanguageDetector;
 
-import java.util.*;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
+    private static  Logger logger = Logger.getLogger(Main.class);
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter file path where documents are located:");
 
-        //TODO Uncomment for production String path = scanner.nextLine();
+        //TODO Uncomment for prouction String path = scanner.nextLine();
         String path = "/home/oem/IntelliJIDEAProjects/invertedindex/src/main/resources/input";
-        System.out.println("> Indexing process started...");
+        logger.info("Indexing process started...");
 
         InvertedIndex.getInstance().addFilesToIndex(path);
 

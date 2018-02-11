@@ -1,9 +1,13 @@
 package filter;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class EnStopWordsFilter implements IStopWordsFilter {
+    private Logger logger = Logger.getLogger(EnStopWordsFilter.class);
+
     private Set<String> stopWords;
     private static IStopWordsFilter instance = new EnStopWordsFilter();
 
@@ -11,7 +15,7 @@ public class EnStopWordsFilter implements IStopWordsFilter {
         try {
             stopWords = loadStopWords("stopwords_en.txt");
         } catch (Exception e) {
-            // TODO log error
+            logger.error("Failed to load english stop words.", e);
             stopWords = new HashSet<>();
         }
     }
