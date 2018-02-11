@@ -1,10 +1,7 @@
 import index.InvertedIndex;
 import processor.TextProcessor;
 import processor.WordProcessor;
-import utils.EnStemmer;
-import utils.EnStopWordsFilter;
-import utils.RoStemmer;
-import utils.RoStopWordsFilter;
+import utils.*;
 
 import java.io.File;
 import java.util.*;
@@ -24,18 +21,32 @@ public class Main {
 
         System.out.println("Enter search words:");
         String searchWords;
-        while (!(searchWords = "oameni"//TODO Uncomment for production scanner.nextLine()
-                 ).equals("exit")) {
-            String result;
+        while (!(searchWords = scanner.nextLine()).equals("exit")) {
+            List<String> result = getSearchResult(searchWords);
+            if (result.isEmpty()) {
+                System.out.println("> Your query doesn't match any document.");
+            } else {
+                System.out.println("> Your query matches the following documents, presented in a ranked order: ");
+                for (String docPath : result) {
+                    System.out.println("> " + docPath);
+                }
+            }
+        }
+    }
+
+    private static List<String> getSearchResult(String searchWords) {
+        List<String> result;
+        if (Language.RO ==  LanguageDetector.detectLanguage(searchWords)) {
+            List<String> words = new TextProcessor(searchWords, new WordProcessor(RoStopWordsFilter.getInstance(), RoStemmer.getInstance())).getAllWords();
+            result = InvertedIndex.getInstance().searchWordsInIndex(words);
+        } else {
             List<String> words = new TextProcessor(searchWords, new WordProcessor(EnStopWordsFilter.getInstance(), EnStemmer.getInstance())).getAllWords();
             result = InvertedIndex.getInstance().searchWordsInIndex(words);
-            if (result.equals(InvertedIndex.NO_RESULT)) {
+            if (result.isEmpty()) { // difficult to detect ro from few words
                 words = new TextProcessor(searchWords, new WordProcessor(RoStopWordsFilter.getInstance(), RoStemmer.getInstance())).getAllWords();
                 result = InvertedIndex.getInstance().searchWordsInIndex(words);
             }
-            System.out.println(result);
-            //TODO DELETE THIS LINE for production
-            System.exit(0);
         }
+        return result;
     }
 }

@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class InvertedIndex {
 
-    public static final String NO_RESULT = "No result";
     private AtomicLong crtId = new AtomicLong();
 
     private Map<Long, String> idToFile = new ConcurrentHashMap<>();
@@ -85,7 +84,7 @@ public class InvertedIndex {
         }
     }
 
-    public String searchWordsInIndex(List<String> words) {
+    public List<String> searchWordsInIndex(List<String> words) {
         List<SortedSet<DocToOccurrences>> allDocuments = new ArrayList<>();
         for (String word : words) {
             if (index.containsKey(word)) {
@@ -93,22 +92,28 @@ public class InvertedIndex {
             }
         }
         if (allDocuments.isEmpty()) {
-            return NO_RESULT;
+            return Collections.EMPTY_LIST;
         }
         if (allDocuments.size() == 1) {
-            DocToOccurrences docToOccurrences =  allDocuments.get(0).first();
-            return idToFile.get(docToOccurrences.getDocumentId());
+            return getDocumentsInRankOrder(allDocuments.get(0));
         }
-        TreeSet<DocToOccurrences> intersection = new TreeSet<>(allDocuments.get(0));
+        SortedSet<DocToOccurrences> intersection = Collections.synchronizedSortedSet(new TreeSet<>(allDocuments.get(0)));
 
         for (int i = 1; i < allDocuments.size(); ++i) {
             intersection.retainAll(allDocuments.get(i));
         }
 
         if (intersection.isEmpty()) {
-            return  NO_RESULT;
+            return  Collections.EMPTY_LIST;
         }
-        DocToOccurrences docToOccurrences =  intersection.first();
-        return idToFile.get(docToOccurrences.getDocumentId());
+        return getDocumentsInRankOrder(intersection);
+    }
+
+    private List<String> getDocumentsInRankOrder(SortedSet<DocToOccurrences> documents) {
+        List<String> docNames = new ArrayList<>();
+        for (DocToOccurrences docToOccurrences: documents) {
+            docNames.add(idToFile.get(docToOccurrences.getDocumentId()));
+        }
+        return docNames;
     }
 }

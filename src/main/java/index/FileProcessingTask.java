@@ -20,16 +20,16 @@ public class FileProcessingTask implements Callable<Map<String, Integer>> {
     }
 
     public Map<String, Integer> call() throws IOException, TikaException, SAXException {
-        Map<String, Integer> wordCount = new ConcurrentHashMap<>();
+        Map<String, Integer> wordCounter = new ConcurrentHashMap<>();
         DocumentReader reader = new DocumentReader(file);
         TextProcessor textProcessor = new TextProcessor(reader.readContent());
         String processedWord;
         while ((processedWord = textProcessor.getNextWord()) != null) {
-            if (!wordCount.containsKey(processedWord)) {
-                wordCount.put(processedWord, 0);
+            if (!wordCounter.containsKey(processedWord)) {
+                wordCounter.put(processedWord, 0);
             }
-            wordCount.put(processedWord, wordCount.get(processedWord) + 1);
+            wordCounter.put(processedWord, wordCounter.get(processedWord) + 1);
         }
-        return wordCount;
+        return wordCounter;
     }
 }
