@@ -45,4 +45,8 @@ class DocToOccurrences implements Comparable<DocToOccurrences>{
     public long getDocumentId() {
         return documentId;
     }
+
+    public AtomicLong getWordOccurrences() {
+        return wordOccurrences;
+    }
 }

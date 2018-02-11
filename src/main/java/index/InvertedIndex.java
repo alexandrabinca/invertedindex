@@ -168,6 +168,7 @@ public class InvertedIndex {
         List<String> docNames = new ArrayList<>();
         for (DocToOccurrences docToOccurrences: documents) {
             docNames.add(idToFile.get(docToOccurrences.getDocumentId()));
+            //docNames.add(idToFile.get(docToOccurrences.getDocumentId()) + " (occurrences :" + docToOccurrences.getWordOccurrences() + ")");
         }
         return docNames;
     }
