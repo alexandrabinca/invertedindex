@@ -1,10 +1,12 @@
 package utils;
 
+import org.apache.commons.validator.routines.UrlValidator;
+
 public class Normalizer {
+
     public static String normalize(String word) {
-        if (word.startsWith("http") || word.startsWith("image:") || word.contains("wikimedia")
-                || word.startsWith("file:") || word.endsWith(".jpg") || word.endsWith(".png") || word.endsWith(".svg")
-                || word.endsWith(".html")) {
+        if (isUrl(word) || isFilePath(word)) {
+            System.out.println(word);
             return "";
         }
         StringBuilder sb = new StringBuilder();
@@ -15,4 +17,13 @@ public class Normalizer {
         }
         return  sb.toString();
     }
+
+    private static boolean isUrl(String word) {
+        return UrlValidator.getInstance().isValid(word);
+    }
+
+    private static boolean isFilePath(String word) {
+        return word.endsWith(".jpg") || word.endsWith(".png") || word.endsWith(".svg") || word.endsWith(".html");
+    }
+
 }

@@ -1,5 +1,7 @@
 package index;
 
+import index.task.FileProcessingTask;
+import index.task.IndexingTask;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.File;

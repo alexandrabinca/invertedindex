@@ -2,10 +2,12 @@ import index.InvertedIndex;
 import processor.TextProcessor;
 import processor.WordProcessor;
 import utils.*;
+import filter.EnStopWordsFilter;
+import filter.RoStopWordsFilter;
+import stemmer.EnStemmer;
+import stemmer.RoStemmer;
 
-import java.io.File;
 import java.util.*;
-import java.util.concurrent.*;
 
 public class Main {
 

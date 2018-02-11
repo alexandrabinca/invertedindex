@@ -3,6 +3,8 @@ package processor;
 
 import org.apache.commons.lang3.StringUtils;
 import utils.*;
+import filter.IStopWordsFilter;
+import stemmer.IStemmer;
 
 public class WordProcessor {
 

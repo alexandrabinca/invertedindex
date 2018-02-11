@@ -1,4 +1,4 @@
-package utils;
+package stemmer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.tartarus.snowball.ext.RomanianStemmer;

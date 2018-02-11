@@ -1,4 +1,4 @@
-package index;
+package index.task;
 
 import index.InvertedIndex;
 

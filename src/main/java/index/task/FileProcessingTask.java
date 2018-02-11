@@ -1,4 +1,4 @@
-package index;
+package index.task;
 
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;

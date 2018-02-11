@@ -1,4 +1,4 @@
-package utils;
+package stemmer;
 
 public interface IStemmer {
     String stem(String word);

@@ -1,4 +1,4 @@
-package utils;
+package filter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +21,7 @@ public class RoStopWordsFilter implements IStopWordsFilter {
         return instance;
     }
 
-    public boolean isStopWord(String stopWord) {
-        return stopWords.contains(stopWord);
+    public boolean isStopWord(String word) {
+        return stopWords.contains(word);
     }
 }
