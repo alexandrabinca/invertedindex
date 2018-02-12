@@ -144,6 +144,8 @@ public class InvertedIndex {
         for (String word : words) {
             if (index.containsKey(word)) {
                 allDocuments.add(index.get(word));
+            } else {
+                return Collections.EMPTY_LIST;
             }
         }
         if (allDocuments.isEmpty()) {

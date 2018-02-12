@@ -84,4 +84,17 @@ public class FunctionalTest {
         List<String> result = InvertedIndex.getInstance().getSearchResult("!");
         assertEquals(0, result.size());
     }
+
+    @Test
+    public void testOneWordFromSearchWordsDoesNotExistInIndex() {
+        List<String> resultOameni = InvertedIndex.getInstance().getSearchResult("oameni");
+        assertEquals(1, resultOameni.size());
+        assertTrue(resultOameni.get(0).endsWith("BucuresÌ¦ti.pdf"));
+
+        List<String> resultMinunanti = InvertedIndex.getInstance().getSearchResult("minunati");
+        assertEquals(0, resultMinunanti.size());
+
+        List<String> resultOameniMinunanti = InvertedIndex.getInstance().getSearchResult("oameni minunati");
+        assertEquals(0, resultOameniMinunanti.size());
+    }
 }
